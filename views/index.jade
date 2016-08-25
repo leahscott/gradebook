@@ -1,0 +1,62 @@
+extends layout
+
+block content
+	.container
+
+		if (!user)
+			h1 Welcome to GradeBookPro
+			h3(style="padding-bottom:40px;") The gradebook application for everyone!
+			p Looks like you're new:
+			a.btn.btn-default(href="/login") Login
+			&nbsp;
+			a.btn.btn-primary(href="/register") Register
+
+		if (user)
+			.alert.alert-success.alert-dismissible.fade.in.hidden(role="alert")
+				button.close(type="button", data-dismiss="alert")
+					span(aria-hidden="true")&times;
+				#[strong Success!] A new student has been registered.
+			p.text-right Logged in as #[span.text-primary #[i(style="padding-left:5px").glyphicon.glyphicon-user] #{user.username}]
+			nav.navbar.navbar-default
+				.container-fluid
+					a.navbar-brand(href="/") GradeBookPro
+					ul.nav.navbar-nav.navbar-right
+						li
+							a(href="/logout") Logout #[i.glyphicon.glyphicon-log-out]
+			.row
+				.col-md-4
+					.panel.panel-primary
+						.panel-heading
+							h3.panel-title Add New Student
+						.panel-body
+
+							// New Student Form
+							form(role='form', action="/login", method="post", id="new-student")
+								.form-group
+										input.form-control(type='text', name="first_name", placeholder='First Name', required)
+								.form-group
+									input.form-control(type='text', name="last_name", placeholder='Last Name', required)
+								.form-group
+									input.form-control(type='number', min='1', max='20', name="class", placeholder='Class #', required)
+								.form-group
+									input.form-control(type='number', min='0', max='4', step="0.1", name="gpa", placeholder='GPA', required)
+								button.btn.btn-primary(type='submit') Submit
+
+				.col-md-8
+					.panel.panel-default
+						.panel-heading
+							h3.panel-title Registered Students
+						table#current-students.table
+							tr.heading-row
+								th #
+								th First Name
+								th Last Name
+								th Class
+								th GPA
+							for student, index in students
+								tr.student
+									th.student-num #{index+1}
+									td.student-first-name #{student.first_name}
+									td.student-last-name #{student.last_name}
+									td.student-class #{student.class_id}
+									td.student-gpa #{student.gpa}
