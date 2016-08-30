@@ -12,17 +12,21 @@ block content
 			a.btn.btn-primary(href="/register") Register
 
 		if (user)
-			.alert.alert-success.alert-dismissible.fade.in.hidden(role="alert")
+			.alert.alert-success.alert-dismissible.fade.in.hidden.student-created(role="alert")
 				button.close(type="button", data-dismiss="alert")
 					span(aria-hidden="true")&times;
 				#[strong Success!] A new student has been registered.
+			.alert.alert-success.alert-dismissible.fade.in.hidden.student-deleted(role="alert")
+				button.close(type="button", data-dismiss="alert")
+					span(aria-hidden="true")&times;
+				#[strong Success!] A student has been deleted.
 			p.text-right Logged in as #[span.text-primary #[i(style="padding-left:5px").glyphicon.glyphicon-user] #{user.username}]
 			nav.navbar.navbar-default
 				.container-fluid
 					a.navbar-brand(href="/") GradeBookPro
 					ul.nav.navbar-nav.navbar-right
 						li
-							a(href="/logout") Logout #[i.glyphicon.glyphicon-log-out]
+							a(href="/logout") Logout #[i.glyphicon.glyphicon-log-out(style="padding-left:3px")]
 			.row
 				.col-md-4
 					.panel.panel-primary
@@ -53,6 +57,7 @@ block content
 								th Last Name
 								th Class
 								th GPA
+								th
 							for student, index in students
 								tr.student
 									th.student-num #{index+1}
@@ -60,3 +65,8 @@ block content
 									td.student-last-name #{student.last_name}
 									td.student-class #{student.class_id}
 									td.student-gpa #{student.gpa}
+									td.edit-link
+										a(title="Edit", href="/edit/#{student.id}")
+											i.glyphicon.glyphicon-pencil
+										a(title="Delete", href="/destroy/#{student.id}", class="text-danger", style="padding-left:20px")
+											i.glyphicon.glyphicon-trash

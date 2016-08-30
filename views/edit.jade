@@ -1,0 +1,56 @@
+extend layout
+
+block content
+	.container
+		if (!user)
+			h1 Welcome to GradeBookPro
+			h3(style="padding-bottom:40px;") The gradebook application for everyone!
+			p Looks like you're new:
+			a.btn.btn-default(href="/login") Login
+			&nbsp;
+			a.btn.btn-primary(href="/register") Register
+		if (user)
+			.alert.alert-success.alert-dismissible.fade.in.hidden(role="alert")
+				button.close(type="button", data-dismiss="alert")
+					span(aria-hidden="true")&times;
+				#[strong Success!] A new student has been registered.
+			p.text-right Logged in as #[span.text-primary #[i(style="padding-left:5px").glyphicon.glyphicon-user] #{user.username}]
+			nav.navbar.navbar-default
+				.container-fluid
+					a.navbar-brand(href="/") GradeBookPro
+					ul.nav.navbar-nav.navbar-right
+						li
+							a(href="/logout") Logout #[i.glyphicon.glyphicon-log-out(style="padding-left:3px")]
+			.row(style="padding-top:40px")
+				.col-md-5
+					h1(style="margin:0 0 30px") Update Student Record
+					p(style="line-height:2") Fill in the form to update any information about a student and click Save when you're done.
+				.col-md-7
+					.panel.panel-primary
+						.panel-heading
+							h3.panel-title Update Student Info
+						.panel-body
+
+							form(role='form', action="/edit", method="post", id="update-student")
+								input(type="hidden", name="student_id", value="#{student.id}")
+								.form-group.row
+									label.col-md-3.col-form-label(for="first_name") First Name:
+									.col-md-9
+										input.form-control(type='text', name="first_name", placeholder='First Name', value='#{student.first_name}', required)
+								.form-group.row
+									label.col-md-3.col-form-label(for="last_name") Last Name:
+									.col-md-9
+										input.form-control(type='text', name="last_name", placeholder='Last Name', value='#{student.last_name}', required)
+								.form-group.row
+									label.col-md-3.col-form-label(for="class") Class:
+									.col-md-9
+										input.form-control(type='number', min='1', max='40', name="class", placeholder='Class #', value='#{student.class_id}', required)
+								.form-group.row
+									label.col-md-3.col-form-label(for="gpa") GPA:
+									.col-md-9
+										input.form-control(type='number', min='0', max='4', step="0.1", name="gpa", placeholder='GPA', value="#{student.gpa}", required)
+								button.btn.btn-primary(type='submit', style="margin-right:10px") Submit
+								button.btn.btn-danger #[i.glyphicon.glyphicon-trash(style="margin-right:5px")] Delete Student
+
+
+

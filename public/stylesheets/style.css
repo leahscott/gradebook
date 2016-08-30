@@ -1,8 +1,13 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  padding: 20px 0;
 }
 
 a {
   color: #00B7FF;
+}
+
+.col-form-label {
+	padding-top: .9rem;
+	margin-bottom: 0;
 }
