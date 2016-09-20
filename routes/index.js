@@ -97,4 +97,30 @@ router.get('/destroy/:id', function(req, res) {
     });
 });
 
+router.post('/student-search', function(req, res) {
+    var query = req.body.name;
+    if (query !== '') {
+        Student.find({'first_name': query}, function(err, result){
+            if (err) throw err;
+            console.log(result);
+            res.send(result);
+        });
+    } else {
+        Student.find({}, function(err, students){
+            if (err) throw err;
+            res.send(students);
+        });
+    }
+});
+
+router.get('/get-featured-students', function(req,res) {
+    Student.find({}).sort({gpa: 'desc'}).exec(function(err, students){
+        if (err) throw err;
+        // Remove all but the first and last student
+        students.splice(1, students.length - 2);
+        res.send(students);
+    });
+
+});
+
 module.exports = router;

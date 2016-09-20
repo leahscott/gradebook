@@ -10,10 +10,6 @@ block content
 			&nbsp;
 			a.btn.btn-primary(href="/register") Register
 		if (user)
-			.alert.alert-success.alert-dismissible.fade.in.hidden(role="alert")
-				button.close(type="button", data-dismiss="alert")
-					span(aria-hidden="true")&times;
-				#[strong Success!] A new student has been registered.
 			p.text-right Logged in as #[span.text-primary #[i(style="padding-left:5px").glyphicon.glyphicon-user] #{user.username}]
 			nav.navbar.navbar-default
 				.container-fluid
@@ -21,6 +17,7 @@ block content
 					ul.nav.navbar-nav.navbar-right
 						li
 							a(href="/logout") Logout #[i.glyphicon.glyphicon-log-out(style="padding-left:3px")]
+			a(href="/", style="margin: 40px 0 15px;display:block") #[i.glyphicon.glyphicon-chevron-left] Back to All Students
 			.row(style="padding-top:40px")
 				.col-md-5
 					h1(style="margin:0 0 30px") Update Student Record
@@ -50,7 +47,7 @@ block content
 									.col-md-9
 										input.form-control(type='number', min='0', max='4', step="0.1", name="gpa", placeholder='GPA', value="#{student.gpa}", required)
 								button.btn.btn-primary(type='submit', style="margin-right:10px") Submit
-								button.btn.btn-danger #[i.glyphicon.glyphicon-trash(style="margin-right:5px")] Delete Student
+								a.btn.btn-danger(href="/destroy/#{student.id}") #[i.glyphicon.glyphicon-trash(style="margin-right:5px")] Delete Student
 
 
 

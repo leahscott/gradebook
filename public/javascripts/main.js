@@ -13,10 +13,52 @@ $(function(){
 			url: '/create-student',
 			success: function(data) {
 				document.getElementById('new-student').reset();
-				addStudent(data[0].value, data[1].value, data[2].value, data[3].value, data[4].value);
+				addStudent(data[0].value, data[1].value, data[2].value, data[3].value, data[4].value, true);
 			}
 		});
 		event.preventDefault();
+	});
+
+	/*
+	 * Search form handleing
+	 */
+	$('form#student-search').on('submit', function(event){
+		var query = $(this).find('input').val().trim();
+		console.log(query);
+		$.ajax({
+			type: 'POST',
+			data: { name: query },
+			url: '/student-search',
+			success: function(data) {
+				clearStudentsTable();
+
+				if (data.length == 0) {
+					$('.no-students').removeClass('hidden');
+				} else {
+					$.each(data, function(index, student){
+						addStudent(student.first_name, student.last_name, student.class_id, student.gpa, student.id, false);
+					});
+				}
+			}
+		});
+		event.preventDefault();
+	});
+
+	$.ajax({
+		type: 'GET',
+		url: 'get-featured-students',
+		success: function(data) {
+			var bestStudent = data[0],
+				worstStudent = data[1],
+				$highestGpa = $('.highest-gpa'),
+				$lowestGpa = $('.lowest-gpa')
+
+			$highestGpa.find('.featured-name').text(bestStudent.first_name + " " + bestStudent.last_name);
+			$highestGpa.find('.featured-class').text("Class: " + bestStudent.class_id);
+
+			$lowestGpa.find('.featured-name').text(worstStudent.first_name + " " + worstStudent.last_name);
+			$lowestGpa.find('.featured-class').text("Class: " + worstStudent.class_id);
+		}
 	});
 
 	/*
@@ -53,7 +95,7 @@ $(function(){
 	/*
 	 * Add new student to the document
 	 */
-	function addStudent(firstName, lastName, classId, gpa, id) {
+	function addStudent(firstName, lastName, classId, gpa, id, notify) {
 		// Get index of the new student based on current last student index
 		var currentIndex = parseInt( $('table#current-students .student:last-child').find('.student-num').text() ) || 0;
 		var newIndex = currentIndex + 1;
@@ -63,6 +105,20 @@ $(function(){
 		$('table#current-students').append($newStudent);
 		$newStudent.fadeIn('slow');
 		// Trigger success banner
-		$('.student-created').removeClass('hidden');
+		if (notify) {
+			$('.student-created').removeClass('hidden');
+		}
+
+	}
+
+	/*
+	 * Delete all student rows from the current students table
+	 */
+	function clearStudentsTable() {
+		// Hide the no students found message if it is active
+		$('.no-students').addClass('hidden');
+		// Clear table
+		var students = $('table#current-students').find('tr.student');
+		students.fadeOut(100);
 	}
 });
