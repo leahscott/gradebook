@@ -57,24 +57,34 @@ passport.use(new GoogleStrategy({
         callbackURL: config.googleAuth.callbackURL
     },
     function(token, refreshToken, profile, done) {
+        console.log(profile);
         process.nextTick(function() {
             // try to find the user based on their google id
             Account.findOne({ 'google.id' : profile.id }, function(err, user) {
                 if (err) return done(err);
-                if (user) {
-                    // if user is found, log them in
-                    return done(null, user);
-                } else {
-                    //if the user isnt in our database, create a new user
-                    var newAccount= new Account();
-                    newAccount.google.id    = profile.id;
-                    newAccount.google.token = token;
-                    newAccount.username     = profile.displayName;
 
-                    newAccount.save(function(err) {
-                        if(err) throw err;
-                        return done(null, newAccount);
-                    });
+                // if the user is attempting to log in with a
+                // valid greenhouse.io email
+                if (profile._json.domain == "greenhouse.io") {
+
+                    if (user) {
+                        // if user is found, log them in
+                        return done(null, user);
+                    } else {
+                        //if the user isnt in our database, create a new user
+                        var newAccount= new Account();
+                        newAccount.google.id    = profile.id;
+                        newAccount.google.token = token;
+                        newAccount.username     = profile.displayName;
+
+                        newAccount.save(function(err) {
+                            if(err) throw err;
+                            return done(null, newAccount);
+                        });
+                    }
+                } else {
+                    // if the email domain is not greenhouse.io, return error
+                    done(new Error("Invalid host name. Sign in is only possible for those with greenhouse.io email addresses."))
                 }
             });
         });
