@@ -39,6 +39,12 @@ router.post('/login', passport.authenticate('local'), function(req, res) {
     res.redirect('/');
 });
 
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
+
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), function(req, res) {
+    res.redirect('/');
+});
+
 router.get('/logout', function(req, res) {
     req.logout();
     res.redirect('/');

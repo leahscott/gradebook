@@ -1,6 +1,25 @@
 extends layout
 
 block content
+
+  style.
+    .or-container {
+      position: relative;
+      background: #aaa;
+      height: 1px;
+      margin: 40px 0;
+      width:  300px;
+    }
+    .or {
+      position: absolute;
+      top:  50%;
+      left:  50%;
+      transform: translate(-50%,-50%);
+      background: white;
+      padding: 0 15px;
+      text-transform: uppercase;
+    }
+
   .container
     h1 Login
     p.lead View your gradebooks and more.
@@ -14,3 +33,9 @@ block content
       &nbsp;
       a(href='/')
         button.btn.btn-primary(type="button") Cancel
+
+    .or-container
+      span.or.text-muted Or
+
+    a(href="/auth/google")
+      img(src="/images/google-sign-in.png", style="max-width:307px")

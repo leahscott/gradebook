@@ -9,7 +9,10 @@ var session = require('express-session');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
 var RedisStore = require('connect-redis')(session);
+
+var config = require('./config.js');
 
 var routes = require('./routes/index');
 
@@ -46,6 +49,37 @@ var Account = require('./models/account');
 passport.use(new LocalStrategy(Account.authenticate()));
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
+
+// configure the Google strategy for use by passport
+passport.use(new GoogleStrategy({
+        clientID: config.googleAuth.clientID,
+        clientSecret: config.googleAuth.clientSecret,
+        callbackURL: config.googleAuth.callbackURL
+    },
+    function(token, refreshToken, profile, done) {
+        process.nextTick(function() {
+            // try to find the user based on their google id
+            Account.findOne({ 'google.id' : profile.id }, function(err, user) {
+                if (err) return done(err);
+                if (user) {
+                    // if user is found, log them in
+                    return done(null, user);
+                } else {
+                    //if the user isnt in our database, create a new user
+                    var newAccount= new Account();
+                    newAccount.google.id    = profile.id;
+                    newAccount.google.token = token;
+                    newAccount.username     = profile.displayName;
+
+                    newAccount.save(function(err) {
+                        if(err) throw err;
+                        return done(null, newAccount);
+                    });
+                }
+            });
+        });
+    }
+));
 
 // mongoose
 mongoose.connect('mongodb://localhost/passport_local_mongoose_express4');
