@@ -4,10 +4,12 @@ var passportLocalMongoose = require('passport-local-mongoose');
 
 var Student = new Schema(
 	{
-	    first_name : String,
-	    last_name  : String,
-	    class_id   : Number,
-	    gpa		   : Number
+	    first_name  : String,
+	    last_name   : String,
+	    class_id    : Number,
+	    gpa		    : Number,
+	    active	    : Boolean,
+	    date_joined : Date
 	},
 	{
 		autoIndex: false

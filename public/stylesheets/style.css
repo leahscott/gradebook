@@ -30,3 +30,19 @@ a {
 	text-transform: uppercase;
 	letter-spacing: 1px;
 }
+
+.activity-btn {
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	margin: 5px auto;
+	border: 1px solid transparent;
+}
+
+.activity-btn.active {
+	background: #5cb85c;
+}
+
+.activity-btn.inactive {
+	border-color: #777;
+}

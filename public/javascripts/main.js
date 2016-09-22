@@ -96,11 +96,8 @@ $(function(){
 	 * Add new student to the document
 	 */
 	function addStudent(firstName, lastName, classId, gpa, id, notify) {
-		// Get index of the new student based on current last student index
-		var currentIndex = parseInt( $('table#current-students .student:last-child').find('.student-num').text() ) || 0;
-		var newIndex = currentIndex + 1;
 		// Create HTML string for new student
-		var $newStudent = $('<tr class="student"><th class="student-num">'+newIndex+'</th><td class="student-first-name">'+firstName+'</td><td class="student-last-name">'+lastName+'</td><td class="student-class">'+classId+'</td><td class="student gpa">'+gpa+'</td><td class="edit-link"><a title="Edit" href="/edit/'+id+'"><i class="glyphicon glyphicon-pencil"></i></a><a href="/destroy/'+id+'" title="Delete" class="text-danger" style="padding-left:20px"><i class="glyphicon glyphicon-trash"></i></a></td></tr>').hide();
+		var $newStudent = $('<tr class="student"><td class="student-activity"><div class="activity-btn active"></div></td><td class="student-first-name">'+firstName+'</td><td class="student-last-name">'+lastName+'</td><td class="student-class">'+classId+'</td><td class="student gpa">'+gpa+'</td><td class="edit-link"><a title="Edit" href="/edit/'+id+'"><i class="glyphicon glyphicon-pencil"></i></a><a href="/destroy/'+id+'" title="Delete" class="text-danger" style="padding-left:20px"><i class="glyphicon glyphicon-trash"></i></a></td></tr>').hide();
 		// Add new student to document
 		$('table#current-students').append($newStudent);
 		$newStudent.fadeIn('slow');

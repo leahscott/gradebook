@@ -46,8 +46,18 @@ block content
 									label.col-md-3.col-form-label(for="gpa") GPA:
 									.col-md-9
 										input.form-control(type='number', min='0', max='4', step="0.1", name="gpa", placeholder='GPA', value="#{student.gpa}", required)
-								button.btn.btn-primary(type='submit', style="margin-right:10px") Submit
+								.form-group.row
+									label.col-md-3
+									.col-md-9
+										if (student.active)
+											input(type="radio", name="active", value="1" style="margin:0 8px 0 0" checked)
+											| Active
+											input(type="radio", name="active", value="0" style="margin:0 8px 0 20px")
+											| Inactive
+										else
+											input(type="radio", name="active", value="1" style="margin:0 8px 0 0")
+											| Active
+											input(type="radio", name="active", value="0" style="margin:0 8px 0 20px" checked)
+											| Inactive
+								button.btn.btn-primary(type='submit', style="margin-right:10px") Update Info
 								a.btn.btn-danger(href="/destroy/#{student.id}") #[i.glyphicon.glyphicon-trash(style="margin-right:5px")] Delete Student
-
-
-

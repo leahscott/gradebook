@@ -55,7 +55,8 @@ router.post('/create-student', function(req, res) {
         first_name: req.body[0].value,
         last_name: req.body[1].value,
         class_id: req.body[2].value,
-        gpa: req.body[3].value
+        gpa: req.body[3].value,
+        active: true
     });
     newStudent.save(function(err, student){
         if (err) throw err;
@@ -86,9 +87,15 @@ router.post('/edit', function(req, res) {
         classNum = req.body.class,
         gpa = req.body.gpa;
 
+        if (req.body.active == '1') {
+            var isActive = true;
+        } else {
+            var isActive = false;
+        }
+
         console.log(req.body);
 
-    Student.findOneAndUpdate({'_id': studentId}, {first_name: firstName, last_name: lastName, class_id: classNum, gpa: gpa}, function(err, student) {
+    Student.findOneAndUpdate({'_id': studentId}, {active: isActive, first_name: firstName, last_name: lastName, class_id: classNum, gpa: gpa}, function(err, student) {
         if (err) throw err;
         res.redirect('/');
     });
