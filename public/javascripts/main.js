@@ -1,5 +1,7 @@
 $(function(){
 
+	initPage();
+
 	/*
 	 * Submit new student form data to the application
 	 * for processing
@@ -11,9 +13,10 @@ $(function(){
 			data: JSON.stringify(values),
 			contentType: 'application/json',
 			url: '/create-student',
-			success: function(data) {
+			success: function(student) {
 				document.getElementById('new-student').reset();
-				addStudent(data[0].value, data[1].value, data[2].value, data[3].value, data[4].value, true);
+				addStudent(student.first_name, student.last_name, student.date_added, student.class_id, student.gpa, student.id, true);
+				formatDates();
 			}
 		});
 		event.preventDefault();
@@ -36,29 +39,12 @@ $(function(){
 					$('.no-students').removeClass('hidden');
 				} else {
 					$.each(data, function(index, student){
-						addStudent(student.first_name, student.last_name, student.class_id, student.gpa, student.id, false);
+						addStudent(student.first_name, student.last_name, student.date_added, student.class_id, student.gpa, student.id, false);
 					});
 				}
 			}
 		});
 		event.preventDefault();
-	});
-
-	$.ajax({
-		type: 'GET',
-		url: 'get-featured-students',
-		success: function(data) {
-			var bestStudent = data[0],
-				worstStudent = data[1],
-				$highestGpa = $('.highest-gpa'),
-				$lowestGpa = $('.lowest-gpa')
-
-			$highestGpa.find('.featured-name').text(bestStudent.first_name + " " + bestStudent.last_name);
-			$highestGpa.find('.featured-class').text("Class: " + bestStudent.class_id);
-
-			$lowestGpa.find('.featured-name').text(worstStudent.first_name + " " + worstStudent.last_name);
-			$lowestGpa.find('.featured-class').text("Class: " + worstStudent.class_id);
-		}
 	});
 
 	/*
@@ -93,11 +79,52 @@ $(function(){
 	});
 
 	/*
+	 * Logic the must execute on page load
+	 */
+	function initPage(){
+		// get featured students and update the DOM
+		$.ajax({
+			type: 'GET',
+			url: 'get-featured-students',
+			success: function(data) {
+				var bestStudent = data[0],
+					worstStudent = data[1],
+					$highestGpa = $('.highest-gpa'),
+					$lowestGpa = $('.lowest-gpa')
+
+				$highestGpa.find('.featured-name').text(bestStudent.first_name + " " + bestStudent.last_name);
+				$highestGpa.find('.featured-class').text("Class: " + bestStudent.class_id);
+
+				$lowestGpa.find('.featured-name').text(worstStudent.first_name + " " + worstStudent.last_name);
+				$lowestGpa.find('.featured-class').text("Class: " + worstStudent.class_id);
+			}
+		});
+
+		formatDates();
+	}
+
+	/*
+	 * Format student added date
+	 */
+	function formatDates(){
+		var $dates = $('td.student-date-added');
+		$.each($dates, function(index, date){
+			var $initialDate = $(date),
+			 	$dateText = $initialDate.text(),
+				date = new Date($dateText),
+				months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+
+			$initialDate.text( months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear() );
+		});
+	}
+
+
+	/*
 	 * Add new student to the document
 	 */
-	function addStudent(firstName, lastName, classId, gpa, id, notify) {
+	function addStudent(firstName, lastName, dateAdded, classId, gpa, id, notify) {
 		// Create HTML string for new student
-		var $newStudent = $('<tr class="student"><td class="student-activity"><div class="activity-btn active"></div></td><td class="student-first-name">'+firstName+'</td><td class="student-last-name">'+lastName+'</td><td class="student-class">'+classId+'</td><td class="student gpa">'+gpa+'</td><td class="edit-link"><a title="Edit" href="/edit/'+id+'"><i class="glyphicon glyphicon-pencil"></i></a><a href="/destroy/'+id+'" title="Delete" class="text-danger" style="padding-left:20px"><i class="glyphicon glyphicon-trash"></i></a></td></tr>').hide();
+		var $newStudent = $('<tr class="student"><td class="student-activity"><div class="activity-btn active"></div></td><td class="student-first-name">'+firstName+'</td><td class="student-last-name">'+lastName+'</td></td><td class="student-date-added">'+dateAdded+'</td><td class="student-class">'+classId+'</td><td class="student gpa">'+gpa+'</td><td class="edit-link"><a title="Edit" href="/edit/'+id+'"><i class="glyphicon glyphicon-pencil"></i></a><a href="/destroy/'+id+'" title="Delete" class="text-danger" style="padding-left:20px"><i class="glyphicon glyphicon-trash"></i></a></td></tr>').hide();
 		// Add new student to document
 		$('table#current-students').append($newStudent);
 		$newStudent.fadeIn('slow');

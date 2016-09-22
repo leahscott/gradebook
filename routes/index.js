@@ -56,15 +56,14 @@ router.post('/create-student', function(req, res) {
         last_name: req.body[1].value,
         class_id: req.body[2].value,
         gpa: req.body[3].value,
-        active: true
+        active: true,
+        date_added: new Date()
     });
     newStudent.save(function(err, student){
         if (err) throw err;
 
-        console.log('Student Created');
-        req.body.push({name: 'id', value: student.id});
-        console.log(req.body);
-        res.send(req.body);
+        console.log(student);
+        res.send(student);
     });
 });
 

@@ -9,7 +9,7 @@ var Student = new Schema(
 	    class_id    : Number,
 	    gpa		    : Number,
 	    active	    : Boolean,
-	    date_joined : Date
+	    date_added : Date
 	},
 	{
 		autoIndex: false
