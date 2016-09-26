@@ -51,13 +51,19 @@ router.get('/logout', function(req, res) {
 });
 
 router.post('/create-student', function(req, res) {
+    var today = new Date(),
+        year = today.getFullYear(),
+        month = ("0" + (today.getMonth() + 1)).slice(-2),
+        day = ("0" + today.getDate()).slice(-2),
+        dateJoined = year + "-" + month + "-" + day;
+    console.log(dateJoined);
     var newStudent = Student({
         first_name: req.body[0].value,
         last_name: req.body[1].value,
         class_id: req.body[2].value,
         gpa: req.body[3].value,
         active: true,
-        date_added: new Date()
+        date_added: new Date(dateJoined + " 04:00")
     });
     newStudent.save(function(err, student){
         if (err) throw err;
@@ -109,20 +115,33 @@ router.get('/destroy/:id', function(req, res) {
     });
 });
 
-router.post('/student-search', function(req, res) {
-    var query = req.body.name;
-    if (query !== '') {
-        Student.find({'first_name': query}, function(err, result){
-            if (err) throw err;
-            console.log(result);
-            res.send(result);
-        });
-    } else {
-        Student.find({}, function(err, students){
-            if (err) throw err;
-            res.send(students);
-        });
+router.get('/filter-students', function(req, res) {
+    var values = req.query;
+    var query = {
+        'gpa' : { '$gte' : values.fromGpa , '$lte' : values.toGpa }
+    };
+
+    // Build up query
+    if (values.dateJoined) {
+        var startDate = new Date(values.dateJoined);
+        var endDate   = new Date(values.dateJoined);
+        endDate.setHours(23,59,59,59);
+
+        query.date_added = { '$gte' : startDate.toISOString(), '$lte' : endDate.toISOString() };
     }
+
+    if (values.activity == 'active') {
+        query.active = true;
+    } else if (values.activity == 'inactive') {
+        query.active = false;
+    }
+
+    console.log(query);
+
+    Student.find(query, function(err, students){
+        if (err) throw err;
+        res.send(students);
+    });
 });
 
 router.get('/get-featured-students', function(req,res) {
@@ -134,5 +153,13 @@ router.get('/get-featured-students', function(req,res) {
     });
 
 });
+
+router.get('/get-all-students', function(req, res) {
+    Student.find({}, function(err, students){
+        if (err) throw err;
+        res.send(students);
+    });
+});
+
 
 module.exports = router;

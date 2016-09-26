@@ -15,7 +15,7 @@ $(function(){
 			url: '/create-student',
 			success: function(student) {
 				document.getElementById('new-student').reset();
-				addStudent(student.first_name, student.last_name, student.date_added, student.class_id, student.gpa, student.id, true);
+				addStudent(student, true);
 				formatDates();
 			}
 		});
@@ -23,15 +23,35 @@ $(function(){
 	});
 
 	/*
-	 * Search form handleing
+	 * Filter form handleing
 	 */
-	$('form#student-search').on('submit', function(event){
-		var query = $(this).find('input').val().trim();
-		console.log(query);
+	$('form#student-filter').on('submit', function(event){
+		event.preventDefault();
+
+		var $this = $(this),
+			gpaRange = $this.find('input[name="gpa"]').val().split(',');
+			fromGpa = gpaRange[0],
+			toGpa = gpaRange[1],
+			joinDate = $this.find('input[name="date-joined"]').val(),
+			activeIsChecked = $this.find('input[name="active"]').prop('checked'),
+			inactiveIsChecked = $this.find('input[name="inactive"]').prop('checked');
+
+		if (activeIsChecked && inactiveIsChecked) {
+			var activity = 'any';
+		} else if (activeIsChecked) {
+			var activity = 'active';
+		} else {
+			var activity = 'inactive';
+		}
+
+		var querySlug = '/filter-students?fromGpa=' + fromGpa + '&toGpa=' + toGpa + '&dateJoined=' + joinDate + '&activity=' + activity;
+
+		console.log(querySlug);
+
+		var url = '';
 		$.ajax({
-			type: 'POST',
-			data: { name: query },
-			url: '/student-search',
+			type: 'GET',
+			url: querySlug,
 			success: function(data) {
 				clearStudentsTable();
 
@@ -39,12 +59,14 @@ $(function(){
 					$('.no-students').removeClass('hidden');
 				} else {
 					$.each(data, function(index, student){
-						addStudent(student.first_name, student.last_name, student.date_added, student.class_id, student.gpa, student.id, false);
+						addStudent(student, false);
 					});
 				}
+
+				formatDates();
 			}
 		});
-		event.preventDefault();
+
 	});
 
 	/*
@@ -79,7 +101,7 @@ $(function(){
 	});
 
 	/*
-	 * Logic the must execute on page load
+	 * Logic to be executed on page load
 	 */
 	function initPage(){
 		// get featured students and update the DOM
@@ -101,6 +123,17 @@ $(function(){
 		});
 
 		formatDates();
+
+		$('input.gpa-slider').slider({});
+
+		$('input.date-joined').datepicker({
+			format: 'mm-dd-yyyy'
+		});
+
+		$('a.clear-filter').on('click', function(e){
+			e.preventDefault();
+			resetStudentsTable();
+		});
 	}
 
 	/*
@@ -120,11 +153,11 @@ $(function(){
 
 
 	/*
-	 * Add new student to the document
+	 * Add new student to the page
 	 */
-	function addStudent(firstName, lastName, dateAdded, classId, gpa, id, notify) {
+	function addStudent(student, notify) {
 		// Create HTML string for new student
-		var $newStudent = $('<tr class="student"><td class="student-activity"><div class="activity-btn active"></div></td><td class="student-first-name">'+firstName+'</td><td class="student-last-name">'+lastName+'</td></td><td class="student-date-added">'+dateAdded+'</td><td class="student-class">'+classId+'</td><td class="student gpa">'+gpa+'</td><td class="edit-link"><a title="Edit" href="/edit/'+id+'"><i class="glyphicon glyphicon-pencil"></i></a><a href="/destroy/'+id+'" title="Delete" class="text-danger" style="padding-left:20px"><i class="glyphicon glyphicon-trash"></i></a></td></tr>').hide();
+		var $newStudent = $('<tr class="student"><td class="student-activity"><div class="activity-btn ' + (student.active ? 'active' : 'inactive') + '"></div></td><td class="student-first-name">'+student.first_name+'</td><td class="student-last-name">'+student.last_name+'</td></td><td class="student-date-added">'+student.date_added+'</td><td class="student-class">'+student.class_id+'</td><td class="student gpa">'+student.gpa+'</td><td class="edit-link"><a title="Edit" href="/edit/'+student._id+'"><i class="glyphicon glyphicon-pencil"></i></a><a href="/destroy/'+student._id+'" title="Delete" class="text-danger" style="padding-left:20px"><i class="glyphicon glyphicon-trash"></i></a></td></tr>').hide();
 		// Add new student to document
 		$('table#current-students').append($newStudent);
 		$newStudent.fadeIn('slow');
@@ -132,7 +165,6 @@ $(function(){
 		if (notify) {
 			$('.student-created').removeClass('hidden');
 		}
-
 	}
 
 	/*
@@ -144,5 +176,29 @@ $(function(){
 		// Clear table
 		var students = $('table#current-students').find('tr.student');
 		students.fadeOut(100);
+	}
+
+	/*
+	 * Reset students table to show all students
+	 */
+	function resetStudentsTable() {
+		$.ajax({
+			type: 'GET',
+			url: 'get-all-students',
+			success: function(data) {
+
+				clearStudentsTable();
+
+				if (data.length == 0) {
+					$('.no-students').removeClass('hidden');
+				} else {
+					$.each(data, function(index, student){
+						addStudent(student, false);
+					});
+				}
+
+				formatDates();
+			}
+		});
 	}
 });

@@ -46,3 +46,8 @@ a {
 .activity-btn.inactive {
 	border-color: #777;
 }
+
+.form-label {
+	display: block;
+	padding-bottom: 6px;
+}
