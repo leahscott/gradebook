@@ -177,7 +177,9 @@ $(function(){
 		$('.no-students').addClass('hidden');
 		// Clear table
 		var students = $('table#current-students').find('tr.student');
-		students.fadeOut(100);
+		students.fadeOut(100, function(){
+			students.remove();
+		});
 	}
 
 	/*
@@ -221,14 +223,14 @@ $(function(){
 						url: '/create-random-student',
 						data: data.results[0],
 						success: function(student) {
-							document.getElementById('new-student').reset();
 							addStudent(student, true);
-							formatDates();
+
 						}
 					});
 				}
 			});
 			counter++;
 		}
+		formatDates();
 	}
 });
