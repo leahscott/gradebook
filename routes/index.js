@@ -56,7 +56,7 @@ router.post('/create-student', function(req, res) {
         month = ("0" + (today.getMonth() + 1)).slice(-2),
         day = ("0" + today.getDate()).slice(-2),
         dateJoined = year + "-" + month + "-" + day;
-    console.log(dateJoined);
+
     var newStudent = Student({
         first_name: req.body[0].value,
         last_name: req.body[1].value,
@@ -67,10 +67,25 @@ router.post('/create-student', function(req, res) {
     });
     newStudent.save(function(err, student){
         if (err) throw err;
-
-        console.log(student);
         res.send(student);
     });
+});
+
+router.post('/create-random-student', function(req, res) {
+
+    var newStudent = Student({
+        first_name: req.body.firstName,
+        last_name: req.body.lastName,
+        class_id: req.body.classId,
+        gpa: req.body.gpa,
+        active: req.body.active,
+        date_added: req.body.dateAdded
+    });
+    newStudent.save(function(err, student){
+        if (err) throw err;
+        res.send(student);
+    });
+
 });
 
 router.get('/edit/:id', function(req, res) {
